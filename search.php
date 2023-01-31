@@ -91,7 +91,7 @@ if(!isset($_SESSION["username"])){
                         ?>
                         <table bgcolor="#333333" width="80%">
                             <tr bgcolor="#CCCCCC">
-                                <td text 3px>Year</td>
+                                <td>Year</td>
                                 <td>Month</td>
                                 <td>Day</td>
                                 <td>Day of Week</td>
