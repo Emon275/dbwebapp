@@ -7,8 +7,11 @@ $city = "";
 $state = 0;
 $zip = "";
 $salary = "";
-$error = false;
+$error = FALSE;
 $error_message = "Please fill in the following fields:";
+$dberror_message = "The following errors occured:";
+$insert_message = "";
+$record_insert = FALSE;
 
 $servername = "localhost:3306";
 $username = "root";
@@ -16,9 +19,9 @@ $password = "AaryaSingh2005";
 $database = "adptestdb";
 //Create DB Connection
 $conn = new mysqli($servername, $username, $password, $database);
-$conn_error = false;
+$conn_error = FALSE;
 if($conn->connect_error){
-    $conn_error = true;
+    $conn_error = TRUE;
 }
 
 
@@ -40,36 +43,35 @@ if(!isset($_SESSION["username"])){
     if(isset($_POST["Submit"])){
 
         if(empty($_POST["name"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Name";
         } else{
             $name = $_POST["name"];
         }
 
         if(empty($_POST["contact"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Contact";
         } else{
             $contact = $_POST["contact"];
         }
 
         if(empty($_POST["city"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-City";
         } else{
             $city = $_POST["city"];
         }
 
-        echo $_POST["state"]; 
         if(empty($_POST["state"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-State";
         } else{
             $state = $_POST["state"];
         }
 
         if(empty($_POST["zip"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Zip";
         } else{
             $zip = $_POST["zip"];
@@ -77,7 +79,7 @@ if(!isset($_SESSION["username"])){
 
         if(empty($_POST["salary"])){
             echo "sal 1";
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Salary";
         } else{
             echo "sal 2";
@@ -86,8 +88,28 @@ if(!isset($_SESSION["username"])){
                 $salary = $_POST["salary"];
             }else{
                 echo "sal 4";
-                $error = true;
+                $error = TRUE;
                 $error_message .= "<br>-Salary is NAN.";
+            }
+        }
+
+        if(!$error){
+            if($conn->connect_error){
+                $sql = "INSERT INTO salesperson (salesperson_id, salesperson_firstname, salesperson_lastname, salesperson_contact, salesperson_address, salesperson_city, salesperson_state_id, salesperson_zip, salesperson_salary) VALUES('$name','$contact','$city','$state','$zip','$salary')";
+                if($conn->query($sql) == TRUE){
+                    $record_insert = TRUE;
+                    $insert_message = "The following record was inserted into the database:<br>";
+                    $insert_message = "Name: ".$name."<br>";
+                    $insert_message = "Contact: ".$contact."<br>";
+                    $insert_message = "City: ".$city."<br>";
+                    $insert_message = "State: ".$state."<br>";
+                    $insert_message = "Zip: ".$zip."<br>";
+                    $insert_message = "Salary: ".$salary."<br>"; 
+                }else{
+                    $dberror_message .= "<br>-Error inserting record into database.";
+                }
+            }else{
+                $dberror_message .= "<br>-Could not connect to database.";
             }
         }
 
@@ -203,7 +225,7 @@ if(!isset($_SESSION["username"])){
                     State:&nbsp;
                     <select name = "state">
                     <?php
-                        if($conn_error == false){
+                        if($conn_error == FALSE){
                             $sql = "SELECT * FROM adptestdb.state;";
                             $result = $conn->query($sql);
                             while($row = $result->fetch_assoc()){

@@ -16,13 +16,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = 1;
         $error_message .= "<br>&middot;Last Name";
     } else {
-        $fname = $_POST["lastname"];
+        $lname = $_POST["lastname"];
     }
     if (empty($_POST["email"])) {
         $error = 1;
         $error_message .= "<br>&middot;Email";
     } else {
-        $fname = $_POST["email"];
+        $email = $_POST["email"];
     }
 }else{
     //Possible invalid request/access
