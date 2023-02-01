@@ -42,6 +42,7 @@ if(!isset($_SESSION["username"])){
         header("Location: index.php");
     }
 
+
     //Populate Salesperson Fields 
     if(isset($_GET["id"])){
         $id = $_GET["id"];
@@ -117,23 +118,14 @@ if(!isset($_SESSION["username"])){
             }
         }
 
-        if(!$error){
-            if(!$conn->connect_error){
-                $sql = "UPDATE salesperson SET salesperson_name='{$name}',salesperson_contact='{$contact}',salesperson_city='{$city}',salesperson_state_id='{$state}',salesperson_zip='{$zip}',salesperson_salary='{$salary}' where salesperson_id={$id};";
-                echo $sql; 
-                if($conn->query($sql) == TRUE){
-                    $record_update = TRUE;
-                    $update_message = "<br><b>The following record was updated!</b><br>";
-                    
-                    
-                    
-                }else{
-                    $dberror = TRUE;
-                    $dberror_message .= "<br>-Error updating record.";
+
+        if(isset($_POST["Submit"])){
+            $id = $_POST["id"];
+            if ($_POST["Submit"] == "Yes"){
+                if(!$conn->connect_error){
+                    $sql = "DELETE FROM salesperson WHERE salesperson_id={$id};";
+                    $conn->query($sql); 
                 }
-            }else{
-                $dberror = TRUE;
-                $dberror_message .= "<br>-Could not connect to database.";
             }
         }
     }
@@ -225,7 +217,7 @@ if(!isset($_SESSION["username"])){
         <div class="top-container">
             <div class="top-item1">
                 <span class="title">ADP DB WebApp</span><br>
-                <span class="title-reg">SalesPerson Update Form</span>
+                <span class="title-reg">SalesPerson Delete Form</span>
             </div>
             <div class="top-item2">
                 <span class="title-reg">Welcome, <?=$_SESSION["username"]?>.</span><br>
@@ -235,10 +227,10 @@ if(!isset($_SESSION["username"])){
         <a href="search.php" class="back"> > Back to search page</a>
         <br><br>
         <span class="f1">
-            SalesPerson Update Form
+            Remove SalesPerson
         </span><br>
         <span class="f2">
-            Please update fields below.
+            Click 'Yes' to remove the salesperson. 'No' to exit.
         </span><br>
         <?PHP
             if($error){
@@ -251,44 +243,27 @@ if(!isset($_SESSION["username"])){
                 echo "<font>" . $update_message . "</font>";
             }
         ?>
-        <form method="POST" action="update.php">    
-            <div class="form-container">
-                <input type="hidden" name="id" value="<?=$id?>">
-                <div class="form-item1">
-                    Name:<br>
-                    <input type="text" name="name" value="<?=$name?>"><br><br>
-                    Contact:<br>
-                    <input type="text" name="contact" value="<?=$contact?>"><br><br>
-                    City:<br>
-                    <input type="text" name="city" value="<?=$city?>"><br><br>
-                    State:&nbsp;
-                    <select name = "state">
-                    <?php
+        <span>
+            -- SalesPerson Record --<br>
+            Name: <?=$name?><br>
+            Contact: <?=$contact?><br>
+            City: <?=$city?><br>
+            State: <?php
                         if($conn_error == false){
-                            $sql = "SELECT * FROM adptestdb.state;";
+                            $sql = "SELECT * FROM adptestdb.state WHERE state_id={$state};";
                             $result = $conn->query($sql);
                             while($row = $result->fetch_assoc()){
-                                if($state == $row["state_id"]){
-                                    ?>
-                                    <option value="<?=$row["state_id"]?>" selected><?=$row["state_name"]?></option>
-                                <?php
-                                }else{
-                                    ?>
-                                    <option value="<?=$row["state_id"]?>"><?=$row["state_name"]?></option>
-                                <?php
-                                }
+                                echo $row["state_name"];
                             }
                         }
-                    ?>
-                    </select>
-                    <br><br>
-                    Zip:<br>
-                    <input type="text" name="zip" value="<?=$zip?>"><br><br>
-                    Salary:<br>
-                    <input type="text" name="salary" value="<?=$salary?>"><br><br>
-                    <input type="submit" name="Submit" value="Submit">
-                </div>
-            </div>
+                    ?><br>
+            Zip: <?=$zip?><br>
+            Salary: <?=$salary?><br>
+        </span>
+        <form method="POST" action="delete.php"> 
+            <input type="hidden" name="id" value="<?=$id?>">
+                <input type="hidden" name="id" value="<?=$id?>">
+                Delete? <input type="submit" name="Submit" value="Yes"> <input type="submit" name="Submit" value="No">
         </form>
     </body>
 </html>
