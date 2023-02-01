@@ -1,6 +1,7 @@
 <?php
 session_start();
 $action = "";
+$id = 0;
 $name = "";
 $contact = "";
 $city = "";
@@ -8,11 +9,11 @@ $state = 0;
 $zip = "";
 $salary = "";
 $error = FALSE;
+$dberror = FALSE;
 $error_message = "Please fill in the following fields:";
-$dberror = FALSE; 
-$dberror_message = "The following erorrs occured:";
-$insert_message = "";
-$record_insert = FALSE; 
+$dberror_message = "The following errors occured:";
+$update_message = "";
+$record_update = FALSE;
 
 $servername = "localhost:3306";
 $username = "root";
@@ -20,9 +21,9 @@ $password = "AaryaSingh2005";
 $database = "adptestdb";
 //Create DB Connection
 $conn = new mysqli($servername, $username, $password, $database);
-$conn_error = false;
+$conn_error = FALSE;
 if($conn->connect_error){
-    $conn_error = true;
+    $conn_error = TRUE;
 }
 
 
@@ -44,35 +45,35 @@ if(!isset($_SESSION["username"])){
     if(isset($_POST["Submit"])){
 
         if(empty($_POST["name"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Name";
         } else{
             $name = $_POST["name"];
         }
 
         if(empty($_POST["contact"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Contact";
         } else{
             $contact = $_POST["contact"];
         }
 
         if(empty($_POST["city"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-City";
         } else{
             $city = $_POST["city"];
         }
 
         if(empty($_POST["state"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-State";
         } else{
             $state = $_POST["state"];
         }
 
         if(empty($_POST["zip"])){
-            $error = true;
+            $error = TRUE;
             $error_message .= "<br>-Zip";
         } else{
             $zip = $_POST["zip"];
@@ -90,37 +91,27 @@ if(!isset($_SESSION["username"])){
             }
         }
 
+
         if(!$error){
-            if(!$conn->connect_error){
-                $sql = "INSERT INTO salesperson(salesperson_name,salesperson_contact,salesperson_city,salesperson_state_id,salesperson_zip,salesperson_salary) VALUES('$name','$contact','$city','$state','$zip','$salary');";
-                
+            if($conn->connect_error){
+                $sql = "UPDATE salesperson SET salesperson_name='{.$name.}', salesperson_contact='{.$contact.}', salesperson_city='{.$city.}', salesperson_state_id='{.$state.}', salesperson_zip='{.$zip.}', salesperson_salary='{.$salary.}' WHERE salesperson_id={$id}";
                 if($conn->query($sql) == TRUE){
-                    $record_insert = TRUE;
-                    $insert_message = "<br><b>The following record was inserted into the database:</b><br>";
-                    $insert_message .= "Name: " . $name . "<br>";
-                    $insert_message .= "Contact: " . $contact . "<br>";
-                    $insert_message .= "City: " . $city . "<br>";
-                    $insert_message .= "State: " . $state . "<br>";
-                    $insert_message .= "Zip: " . $zip . "<br>";
-                    $insert_message .= "Salary: " . $salary . "<br><br>";
-                    $name = "";
-                    $contact = "";
-                    $city = "";
-                    $state = 0;
-                    $zip = "";
-                    $salary = "";
-                    
-                    
+                    $record_update = TRUE;
+                    $update_message = "The following record was updated in the database:<br>";
+
                 }else{
                     $dberror = TRUE;
-                    $dberror_message .= "<br>-Error inserting record into database.";
+                    $dberror_message .= "<br>-Error updating record into database.";
                 }
             }else{
                 $dberror = TRUE;
                 $dberror_message .= "<br>-Could not connect to database.";
             }
         }
+
+
     }
+
 ?>
 <html>
     <head>
@@ -193,49 +184,42 @@ if(!isset($_SESSION["username"])){
                 font-size: 12pt;
                 color: purple;
             }
-            a.test{
-                font-size: 12pt;
-                color: #000000;
-            }
-            a.test:hover{
-                font-size: 12pt;
-                color: #333333;
-            }
         </style>
     </head>
     <body>
         <div class="top-container">
             <div class="top-item1">
                 <span class="title">ADP DB WebApp</span><br>
-                <span class="title-reg">SalesPerson Entry Form</span>
+                <span class="title-reg">SalesPerson Update Form</span>
             </div>
             <div class="top-item2">
                 <span class="title-reg">Welcome, <?=$_SESSION["username"]?>.</span><br>
                 <span class="title-reg">Click <a href="search.php?action=logout" class="link1">here</a> to logout.</span><br>
             </div>
         </div>
-        <a href="search.php" class="test"> > Back to search page</a>
-        <br><br>
-        
+        <br>
+        <a href="search.php">Back to search page</a>
+        <br>
         <span class="f1">
-            SalesPerson Entry Form
+            SalesPerson Update Form
         </span><br>
         <span class="f2">
-            Please fill in the fields below.
+            Please update the fields below.
         </span><br>
         <?PHP
             if($error){
-                echo "<font color=red>" . $error_message . "</font>";
+            echo "<font color=red>" . $error_message . "</font>";
             }
             if($dberror){
                 echo "<font color=red>" . $dberror_message . "</font>";
             }
-            if($record_insert){
-                echo "<font>" . $insert_message . "</font>";
+            if($record_update){
+                echo "<font>" . $update_message . "</font>";
             }
         ?>
-        <form method="POST" action="insert.php">    
+        <form method="POST" action="update.php">    
             <div class="form-container">
+                <input type="hidden" name="id" value="<?=$id?>">
                 <div class="form-item1">
                     Name:<br>
                     <input type="text" name="name" value="<?=$name?>"><br><br>
@@ -246,7 +230,7 @@ if(!isset($_SESSION["username"])){
                     State:&nbsp;
                     <select name = "state">
                     <?php
-                        if($conn_error == false){
+                        if($conn_error == FALSE){
                             $sql = "SELECT * FROM adptestdb.state;";
                             $result = $conn->query($sql);
                             while($row = $result->fetch_assoc()){

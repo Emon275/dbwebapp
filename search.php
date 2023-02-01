@@ -71,6 +71,43 @@ if(!isset($_SESSION["username"])){
                 font-size: 12pt;
                 color: purple;
             }
+            a.tnav{
+                font-size: 11pt;
+                color: #666666;
+            }
+            a.tnav:hover{
+                font-size: 11pt;
+                color: #D6EEEE;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th{
+                text-align: left;
+                padding: 8px;
+                background-color: #93d2d2;
+                font-weight: bold;
+            }
+            td {
+                text-align: left;
+                padding: 8px;
+            }
+            tr:nth-child(odd) {
+                background-color: #D6EEEE;
+            }
+            span.f2{
+                font-size: 16pt;
+                color: #000000;
+            }
+            a.f2link{
+                font-size: 16pt;
+                color: #004466;
+            }
+            a.f2link:hover{
+                font-size: 16pt;
+                color: #4dc3ff;
+            }
         </style>
     </head>
     <body>
@@ -85,6 +122,7 @@ if(!isset($_SESSION["username"])){
             </div>
         </div>
         <br><br>
+        <a href="insert.php">Go to insert page</a>
             <?php
                 if($conn_error == false){
                     $sql = "SELECT * FROM adptestdb.salesperson LEFT JOIN adptestdb.state on salesperson_state_id=state_id;";
@@ -93,8 +131,7 @@ if(!isset($_SESSION["username"])){
                         ?>
                         <table bgcolor="#333333" width="80%">
                             <tr bgcolor="#CCCCCC">
-                                <td>First Name</td>
-                                <td>Last Name</td>
+                                <td>Name</td>
                                 <td>Contact</td>
                                 <td>City</td>
                                 <td>State</td>
@@ -106,15 +143,14 @@ if(!isset($_SESSION["username"])){
                         while($row = $result->fetch_assoc()){
                         ?>
                             <tr bgcolor="#f2f2f2">
-                                <td><?=$row["salesperson_firstname"]?></td>
-                                <td><?=$row["salesperson_lastname"]?></td>
+                                <td><?=$row["salesperson_name"]?></td>
                                 <td><?=$row["salesperson_contact"]?></td>
                                 <td><?=$row["salesperson_city"]?></td>
                                 <td><?=$row["state_name"]?></td>
                                 <td><?=$row["salesperson_zip"]?></td>
                                 <td>$<?=$row["salesperson_salary"]?></td>
                                 <td>
-                                    <a href="edit.php?action=edit&id=<?=$row["salesperson_id"]?>">Edit</a> / <a href="edit.php?action=delete&id=<?=$row["salesperson_id"]?>">Delete</a>
+                                    <a href="update.php?id=<?=$row["salesperson_id"]?>">Edit</a> / <a href="delete.php?id=<?=$row["salesperson_id"]?>">Delete</a>
                                 </td>
                             </tr>
                         <?php
