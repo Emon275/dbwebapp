@@ -44,6 +44,7 @@ if(!isset($_SESSION["username"])){
 
     if(isset($_POST["Submit"])){
 
+        $id = $_POST["id"];
         if(empty($_POST["name"])){
             $error = TRUE;
             $error_message .= "<br>-Name";
